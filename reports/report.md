@@ -238,7 +238,59 @@ Le score Kaggle (14125) est meilleur que le score Cross-Validation (14806). Cela
 | 007 | Poly Features | 14948 | 13995 |
 | 008 | Cleaning & Outliers | 14051 | 13692 |
 | **009** | **Stacking Cleaned** | **13838** | **13375** |
-- [ ] Analyser les features importance.
-- [ ] Tester d'autres algorithmes (XGBoost, LightGBM).
-- [ ] Feature Engineering (création de variables, gestion des outliers).
-- [ ] Tuning des hyperparamètres.
+| **010** | **Stacking v2 (Ord+LGB)** | **13951** | **13075** |
+| 011 | Stacking v3 (TE+Skew) | 14021 | 12970 |
+| 012 | Tuned Stack + ElasticNet | 13768 | TBD |
+
+### RUN 010: Stacking v2 — Ordinals + Interactions + LightGBM + Early Stopping
+- **Date**: 2026-02-12
+- **Motivation**: Extraire davantage de signal en enrichissant le feature engineering et en diversifiant l'ensemble.
+- **4 Axes d'Amélioration vs RUN 009**:
+    1. **Encodage Ordinal**: 15+ variables qualité (Ex/Gd/TA/Fa/Po → 5/4/3/2/1) converties en numériques au lieu de OneHot.
+    2. **Features d'Interaction**: 12 nouvelles features (QualSF, QualFinishSF, OverallScore, BsmtFinRatio, LivAreaRatio, BsmtScore, GarageScore, ExterScore, etc.).
+    3. **LightGBM**: 4ème base model (leaf-wise, diversité vs XGBoost level-wise).
+    4. **Early Stopping**: XGBoost et LightGBM utilisent eval_set + early_stopping_rounds=100.
+- **Résultats CV**:
+    - MAE: **13950.59**
+    - MAPE: **7.95%**
+    - Meta Coefs: XGB=0.44, Cat=0.45, LGB=0.09, ET=0.05
+    - **Analyse**: Le CV est légèrement supérieur à RUN 009 (13838), mais les features enrichies et l'early stopping généralisent nettement mieux.
+- **Résultats Kaggle (Public Leaderboard)**:
+    - Score: **13074.70**
+    - **Amélioration**: **-300 points** vs RUN 009 (13375) et **-617 points** vs Stacking sans nettoyage (13692).
+    - **Conclusion**: **NOUVEAU RECORD ABSOLU**. L'encodage ordinal et les features d'interaction ont débloqué un signal que le OneHot masquait. Le LightGBM apporte une diversité complémentaire au stack. L'early stopping évite l'overfitting. Progression totale depuis la baseline: **16918 → 13075 (-3843, soit -22.7%)**.
+
+### RUN 011: Stacking v3 — Target Encoding + Skewness + Feature Drop
+- **Date**: 2026-02-12
+- **Motivation**: Enrichir le signal via target encoding (Neighborhood), normaliser les distributions, et réduire le bruit.
+- **3 Axes d'Amélioration vs RUN 010**:
+    1. **Target Encoding OOF**: Neighborhood, Condition1, Exterior1st, Exterior2nd encodés par la moyenne cible (sans leakage).
+    2. **Correction de Skewness**: log1p sur les features numériques à forte asymétrie (>0.75).
+    3. **Feature Drop**: Suppression de Utilities, Street, PoolQC, PoolArea, MiscFeature, MiscVal (quasi-constants ou bruyants).
+- **Résultats CV**:
+    - MAE: **14020.51**
+    - MAPE: **8.01%**
+    - Meta Coefs: XGB=0.45, Cat=0.47, LGB=0.04, ET=0.06
+- **Résultats Kaggle (Public Leaderboard)**:
+    - Score: **12969.71**
+    - **Amélioration**: **-105 points** vs RUN 010 (13075). **NOUVEAU RECORD ABSOLU**.
+    - **Conclusion**: Le target encoding OOF pour Neighborhood est extrêmement puissant. Progression totale: **16918 → 12970 (-3948, soit -23.3%)**.
+
+### RUN 012: Tuned Stacking + ElasticNet Meta-Model
+- **Date**: 2026-02-12
+- **Motivation**: Tirer les derniers gains en affinant les hyperparamètres et le meta-model.
+- **Améliorations vs RUN 011**:
+    1. **Tuning XGBoost**: lr=0.008, depth=4, gamma=0.01, min_child_weight=3, reg_lambda=2.0
+    2. **Tuning CatBoost**: lr=0.02, l2_leaf_reg=5, bagging_temperature=0.5
+    3. **Tuning LightGBM**: lr=0.008, num_leaves=20, min_child_samples=10, reg_lambda=2.0
+    4. **Tuning ExtraTrees**: 800 trees, depth=20, min_samples_leaf=2
+    5. **ElasticNet Meta-Model**: L1+L2 combinés. A zéroté le coefficient de LGB (redondant avec XGB).
+- **Résultats CV**:
+    - MAE: **13767.56** (vs 14020 RUN 011 — nette amélioration)
+    - MAPE: **7.88%** (meilleur MAPE de tout le projet)
+    - ElasticNet > Ridge (13768 vs 13796)
+    - Meta Coefs: XGB=0.58, Cat=0.34, ET=0.10, **LGB=0.00** (éliminé par L1)
+- **Résultats Kaggle (Public Leaderboard)**:
+    - Score: **12882.12**
+    - **Amélioration**: **-88 points** vs RUN 011 (12970). **NOUVEAU RECORD ABSOLU**.
+    - **Conclusion**: Le tuning fin + ElasticNet apportent un gain constant. Progression totale: **16918 → 12882 (-4036, soit -23.9%)**.

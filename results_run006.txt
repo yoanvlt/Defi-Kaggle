@@ -1,3 +1,0 @@
-Stacking MAE: 14346.9755
-Stacking MAPE: 0.0821
-Meta Coefs: [0.47505182 0.4868708  0.06661734]
