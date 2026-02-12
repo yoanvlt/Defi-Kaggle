@@ -207,7 +207,37 @@ Le score Kaggle (14125) est meilleur que le score Cross-Validation (14806). Cela
 | 005 | Blend (w=0.7) | - | 13884 |
 | 006 | Stacking | 14347 | 13868 |
 | 007 | Poly Features | 14948 | 13995 |
-| **008** | **Cleaning & Outliers** | **14051** | **13692** |
+| **008** | **Cleaning + Outliers** | **14051** | **13692** |
+
+### RUN 009: Stacking + Advanced Cleaning (Le "All-In")
+- **Date**: 2026-02-12
+- **Motivation**: Combiner l'architecture gagnante (Stacking) avec la qualité de données du RUN 008.
+- **Méthode**:
+    - **Preprocessing**: Cleaning + Outliers Removal (identique RUN 008).
+    - **Models**: XGBoost + CatBoost + ExtraTrees (Stacking OOF).
+- **Résultats CV**:
+    - MAE: **13837.65** (Record Absolu CV)
+    - MAPE: **7.95%** (Sous la barre des 8%!)
+- **Résultats Kaggle (Public Leaderboard)**:
+    - Score: **13374.62**
+    - **Amélioration**: **-317 points** vs RUN 008 (13692) et **-494 points** vs Stacking sans nettoyage (13868).
+    - **Conclusion**: **RESULTAT EXCEPTIONNEL**.
+        - On a brisé le plafond de verre des 13500.
+        - Cette combinaison (Stacking robuste + Données propres) est la clé.
+        - C'est le résultat final de cette série d'optimisations.
+
+## Tableau Comparatif Final
+| Run | Méthode | MAE Moyen CV | Kaggle Score |
+|---|---|---|---|
+| 001 | Baseline | 16918 | - |
+| 002 | Log Target | 15093 | - |
+| 003 | FE + Tuning | 14806 | 14125 |
+| 004 | CatBoost | 15264 | - |
+| 005 | Blend (w=0.7) | - | 13884 |
+| 006 | Stacking | 14347 | 13868 |
+| 007 | Poly Features | 14948 | 13995 |
+| 008 | Cleaning & Outliers | 14051 | 13692 |
+| **009** | **Stacking Cleaned** | **13838** | **13375** |
 - [ ] Analyser les features importance.
 - [ ] Tester d'autres algorithmes (XGBoost, LightGBM).
 - [ ] Feature Engineering (création de variables, gestion des outliers).
