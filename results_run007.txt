@@ -1,0 +1,4 @@
+Parameters: XGB Run 003 Best
+New Features: ['GrLivArea_sq', 'TotalBsmtSF_sq', '1stFlrSF_sq', '2ndFlrSF_sq', 'GarageArea_sq', 'LotArea_sq', 'MasVnrArea_sq', 'TotalSF_sq', 'TotalSF_x_OverallQual']
+CV MAE: 14947.5762 (+/- 1256.8013)
+CV MAPE: 0.0848

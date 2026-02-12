@@ -148,8 +148,31 @@ Le score Kaggle (14125) est meilleur que le score Cross-Validation (14806). Cela
 | 004 | CatBoost | 15264 | - |
 | 005 | Blend (w=0.7) | - | 13884 |
 | **006** | **Stacking** | **14347** | **13868** |
+| 007 | Poly Features | 14948 | **13994.70** |
 
-## Prochaines Étapes
+### RUN 007: Polynomial Features (Surfaces au Carré)
+- **Date**: 2026-02-12
+- **Motivation**: Tester si l'ajout explicite de termes quadratiques (surface au carré) aide le modèle à mieux capturer les non-linéarités.
+- **Méthode**:
+    - Création de `GrLivArea_sq`, `TotalBsmtSF_sq`, `TotalSF_sq`, etc.
+    - Modèle : XGBoost (mêmes hyperparamètres que RUN 003).
+- **Résultats CV**:
+    - MAE: **14947.58** (+/- 1256.80) - *Légèrement moins bon que RUN 003 (14806)*
+- **Résultats Kaggle (Public Leaderboard)**:
+    - Score: **13994.70**
+    - **Amélioration**: -131 points vs RUN 003 (14125).
+    - **Analyse Critique**: Il est intéressant de noter que si la CV était moins bonne, le score Kaggle s'est amélioré. Cela suggère que la pénalité de complexité observée en CV (sur-apprentissage potentiel sur les folds) n'a pas impacté le test set public de la même manière. Cependant, ce score reste inférieur aux méthodes d'ensemble (Blend: 13884, Stacking: 13868).
+
+## Tableau Comparatif Final
+| Run | Méthode | MAE Moyen CV | Kaggle Score |
+|---|---|---|---|
+| 001 | Baseline | 16918 | - |
+| 002 | Log Target | 15093 | - |
+| 003 | FE + Tuning | 14806 | 14125 |
+| 004 | CatBoost | 15264 | - |
+| 005 | Blend (w=0.7) | - | 13884 |
+| **006** | **Stacking** | **14347** | **13868** |
+| 007 | Poly Features | 14948 | 13995 |
 - [ ] Analyser les features importance.
 - [ ] Tester d'autres algorithmes (XGBoost, LightGBM).
 - [ ] Feature Engineering (création de variables, gestion des outliers).

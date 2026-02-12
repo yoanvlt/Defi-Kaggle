@@ -64,4 +64,38 @@ def add_features(df):
     df_out["HasBasement"] = (temp_df["TotalBsmtSF"] > 0).astype(int)
     df_out["HasFireplace"] = (temp_df["Fireplaces"] > 0).astype(int)
     
+    
+    return df_out
+
+def add_poly_features(df):
+    """
+    Ajoute des features polynomiales (carrés) pour les surfaces.
+    Doit être appliqué APRES add_features (car utilise TotalSF).
+    """
+    df_out = df.copy()
+    
+    # Liste des colonnes à élever au carré
+    # On utilise des patterns ou une liste explicite
+    area_cols = [
+        "GrLivArea", 
+        "TotalBsmtSF", 
+        "1stFlrSF", 
+        "2ndFlrSF", 
+        "GarageArea", 
+        "LotArea", 
+        "MasVnrArea",
+        "TotalSF" # Créée par add_features
+    ]
+    
+    for col in area_cols:
+        if col in df_out.columns:
+            # On remplit les NaNs par 0 avant le carré pour éviter la propagation de NaN
+            # On cast en float pour éviter l'overflow si entiers trop grands
+            series_filled = df_out[col].fillna(0).astype(float)
+            df_out[f"{col}_sq"] = series_filled ** 2
+            
+    # Interaction simple (si dispo)
+    if "TotalSF" in df_out.columns and "OverallQual" in df_out.columns:
+        df_out["TotalSF_x_OverallQual"] = df_out["TotalSF"].fillna(0) * df_out["OverallQual"].fillna(0)
+        
     return df_out
