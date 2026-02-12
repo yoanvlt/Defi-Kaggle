@@ -65,6 +65,36 @@ Prédire le prix de vente des maisons (SalePrice) en minimisant la Mean Absolute
 | 002 | Log Target | 15093 | - | -1825 |
 | 003 | FE + Tuning | **14806** | **8.53%** | **-2112** |
 
+### RUN 004: CatBoost + Log Target
+- **Date**: 2026-02-12
+- **Motivation**: Exploiter la gestion native des variables catégorielles par CatBoost (sans OneHot) pour éviter la perte d'information.
+- **Méthode**:
+    - **Preprocessing**: Variables catégorielles traitées comme telles (pas de Feature Engineering avancé ici).
+    - **Modèle**: CatBoostRegressor (Depth 6, LR 0.03, L2 3) avec Log-Target.
+- **Résultats CV**:
+    - MAE Moyenne = **15263.77** (+/- 1305.28)
+    - MAPE Moyenne = **8.61%**
+    - **Amélioration**: Performance très solide, comparable au XGBoost (RUN 002), mais légèrement en retrait par rapport au RUN 003 qui bénéficiait du Feature Engineering dédié (TotalSF, etc.).
+- **Observations**:
+    - CatBoost est très performant "out-of-the-box" sans feature engineering complexe.
+    - La stabilité (écart-type faible) est excellente.
+
+## Résultats & Validation Kaggle
+
+### Tableau Synthétique (CV vs Leaderboard)
+| Run | Modèle | CV MAE (mean ± std) | Kaggle Public MAE | Commentaire |
+|---|---|---|---|---|
+| 001 | Baseline | 16918 ± 1726 | TBD | - |
+| 002 | Log Target | 15093 ± 1349 | TBD | - |
+| 003 | FE + Tuning | **14806 ± 1540** | **14125.50704** | Meilleur score. Bonne généralisation. |
+| 004 | CatBoost | 15264 ± 1305 | TBD | - |
+
+### Analyse de l'écart (Gap)
+Le score Kaggle (14125) est meilleur que le score Cross-Validation (14806). Cela peut s'expliquer par :
+1. **Distribution du Test Public** : Le leaderboard public n'utilise que 50% du test set. Il est possible que cette partie soit légèrement "plus facile" à prédire (moins d'outliers) que le train set.
+2. **Variance** : L'écart-type de notre CV (~1540) est assez large. Le score Kaggle rentre parfaitement dans l'intervalle de confiance [13266, 16346].
+3. **Robustesse** : Le modèle généralise bien et ne semble pas overfitter le train set. En effet, un score Kaggle très inférieur au CV est souvent bon signe (le modèle n'a pas appris le bruit du train).
+
 ## Prochaines Étapes
 - [ ] Analyser les features importance.
 - [ ] Tester d'autres algorithmes (XGBoost, LightGBM).
