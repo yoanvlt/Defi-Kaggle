@@ -43,6 +43,28 @@ Prédire le prix de vente des maisons (SalePrice) en minimisant la Mean Absolute
     - L'approche log-target est très efficace.
     - XGBoost semble bien performer avec ces hyperparamètres par défaut.
 
+### RUN 003: Feature Engineering + Tuning
+- **Date**: 2026-02-12
+- **Motivation**: Intégrer la connaissance métier (surface totale, âge) et optimiser le modèle pour gagner en précision.
+- **Méthode**:
+    - **Feature Engineering**: Création de `TotalSF`, `TotalBath`, `Age`, `RemodAge`, `TotalPorchSF`, et indicateurs binaires (Piscine, Garage...).
+    - **Tuning**: RandomizedSearchCV sur XGBoost (Best: n_estimators=4000, learning_rate=0.01, max_depth=5, subsample=0.75).
+- **Résultats CV**:
+    - MAE Moyenne = **14806.84** (+/- 1540.52)
+    - MAPE Moyenne = **8.53%** (+/- 1.01%)
+    - **Amélioration**: -287$ vs RUN 002, -2112$ vs Baseline.
+- **Observations**:
+    - Le gain est présent mais modéré par rapport au saut du RUN 002.
+    - Le feature engineering apporte de l'information utile.
+    - Le modèle est plus complexe mais reste robuste (écart-type maîtrisé).
+
+## Tableau Comparatif
+| Run | Méthode | MAE Moyen | MAPE Moyen | Amélioration MAE |
+|---|---|---|---|---|
+| 001 | Baseline | 16918 | 9.74% | - |
+| 002 | Log Target | 15093 | - | -1825 |
+| 003 | FE + Tuning | **14806** | **8.53%** | **-2112** |
+
 ## Prochaines Étapes
 - [ ] Analyser les features importance.
 - [ ] Tester d'autres algorithmes (XGBoost, LightGBM).
