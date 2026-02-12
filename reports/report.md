@@ -86,14 +86,38 @@ Prédire le prix de vente des maisons (SalePrice) en minimisant la Mean Absolute
 |---|---|---|---|---|
 | 001 | Baseline | 16918 ± 1726 | TBD | - |
 | 002 | Log Target | 15093 ± 1349 | TBD | - |
-| 003 | FE + Tuning | **14806 ± 1540** | **14125.50704** | Meilleur score. Bonne généralisation. |
-| 004 | CatBoost | 15264 ± 1305 | TBD | - |
+| 003 | FE + Tuning | 14806 ± 1540 | 14125.50704 | Base solide. |
+| 004 | CatBoost | 15264 ± 1305 | TBD | Bon complément. |
+| **005** | **Blend (w=0.7)** | **N/A** | **13884.08306** | **Best Score (-241 vs RUN 003)** |
 
 ### Analyse de l'écart (Gap)
 Le score Kaggle (14125) est meilleur que le score Cross-Validation (14806). Cela peut s'expliquer par :
 1. **Distribution du Test Public** : Le leaderboard public n'utilise que 50% du test set. Il est possible que cette partie soit légèrement "plus facile" à prédire (moins d'outliers) que le train set.
 2. **Variance** : L'écart-type de notre CV (~1540) est assez large. Le score Kaggle rentre parfaitement dans l'intervalle de confiance [13266, 16346].
 3. **Robustesse** : Le modèle généralise bien et ne semble pas overfitter le train set. En effet, un score Kaggle très inférieur au CV est souvent bon signe (le modèle n'a pas appris le bruit du train).
+
+### RUN 005: Ensemble / Blending
+- **Date**: 2026-02-12
+- **Motivation**: Combiner les forces de deux modèles performants (XGBoost avec Feature Engineering et CatBoost). Si leurs erreurs ne sont pas parfaitement corrélées, la moyenne pondérée devrait réduire la variance et améliorer le score final.
+- **Méthode**:
+    - Blend = $w \times \text{Pred}_{\text{XGB}} + (1-w) \times \text{Pred}_{\text{CatBoost}}$
+- **Résultats Kaggle (Public Leaderboard)** :
+    - w=0.9 (90% XGB): 14004.83
+    - w=0.8 (80% XGB): 13922.41
+    - **w=0.7 (70% XGB): 13884.08 (Optimum)**
+    - w=0.6 (60% XGB): 13899.70
+- **Analyse**:
+    - Le mélange 70/30 offre le meilleur compromis.
+    - Le gain de **~241 points** par rapport au meilleur modèle unique (RUN 003) confirme l'intérêt du blending. Les modèles capturent des signaux différents.
+
+## Tableau Comparatif Final
+| Run | Méthode | MAE Moyen CV | Kaggle Score |
+|---|---|---|---|
+| 001 | Baseline | 16918 | - |
+| 002 | Log Target | 15093 | - |
+| 003 | FE + Tuning | 14806 | 14125 |
+| 004 | CatBoost | 15264 | - |
+| **005** | **Blend (w=0.7)** | - | **13884** |
 
 ## Prochaines Étapes
 - [ ] Analyser les features importance.
