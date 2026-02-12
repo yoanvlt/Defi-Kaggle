@@ -118,6 +118,36 @@ Le score Kaggle (14125) est meilleur que le score Cross-Validation (14806). Cela
 | 003 | FE + Tuning | 14806 | 14125 |
 | 004 | CatBoost | 15264 | - |
 | **005** | **Blend (w=0.7)** | - | **13884** |
+| 006 | Stacking (OOF) | **14347** | **13868.37275** |
+
+### RUN 006: Stacking (Out-Of-Fold)
+- **Date**: 2026-02-12
+- **Motivation**: Aller plus loin que le blending linéaire (poids fixes) en laissant un méta-modèle apprendre la meilleure combinaison des prédictions, tout en garantissant un schéma de validation robuste (OOF) pour éviter le leakage.
+- **Méthode**:
+    - **Niveau 1 (Base Models)** :
+        - XGBoost (Tuned + FE)
+        - CatBoost (Native + Log Target)
+        - ExtraTreesRegressor (Diversité)
+    - **Niveau 2 (Meta Model)** :
+        - Ridge Regression (L2) entraîné sur les prédictions OOF.
+- **Résultats CV (Sur le Train Set via OOF)** :
+    - MAE: **14346.98**
+    - MAPE: **8.21%**
+    - **Analyse CV**: Le score CV du Stacking (14347) est nettement meilleur que celui des modèles individuels.
+- **Résultats Kaggle (Public Leaderboard)** :
+    - **Score**: **13868.37**
+    - **Amélioration**: -16 points vs Blend (RUN 005), -257 points vs XGB seul (RUN 003).
+    - **Conclusion**: Le Stacking est la méthode la plus performante. L'apprentissage des poids par le Ridge via la méthode OOF a permis d'extraire encore un peu plus de signal que le simple mélange manuel.
+
+## Tableau Comparatif Final
+| Run | Méthode | MAE Moyen CV | Kaggle Score |
+|---|---|---|---|
+| 001 | Baseline | 16918 | - |
+| 002 | Log Target | 15093 | - |
+| 003 | FE + Tuning | 14806 | 14125 |
+| 004 | CatBoost | 15264 | - |
+| 005 | Blend (w=0.7) | - | 13884 |
+| **006** | **Stacking** | **14347** | **13868** |
 
 ## Prochaines Étapes
 - [ ] Analyser les features importance.
