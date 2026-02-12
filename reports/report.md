@@ -173,6 +173,41 @@ Le score Kaggle (14125) est meilleur que le score Cross-Validation (14806). Cela
 | 005 | Blend (w=0.7) | - | 13884 |
 | **006** | **Stacking** | **14347** | **13868** |
 | 007 | Poly Features | 14948 | 13995 |
+| **008** | **Cleaning + Outliers** | **14051** | **13691.83** |
+
+### RUN 008: Advanced Cleaning & Outliers
+- **Date**: 2026-02-12
+- **Motivation**: Améliorer la qualité du signal en traitant les données manquantes avec une logique métier (au lieu d'une médiane générique) et en supprimant les observations aberrantes qui trompent le modèle.
+- **Méthode**:
+    - **Suppression Outliers (Train Only)** : Retrait des maisons > 4000 sqft avec prix < 300k$ (Points recommandés par l'auteur du dataset).
+    - **Imputation Métier** :
+        - `PoolQC`, `GarageQual`, etc. -> "None" (Pas d'équipement).
+        - `GarageYrBlt`, `MasVnrArea` -> 0.
+        - `LotFrontage` -> Médiane par voisinage (New!).
+    - **Modèle**: XGBoost (Tuned RUN 003).
+- **Résultats CV**:
+    - MAE: **14050.83** (+/- 451.85)
+    - MAPE: **8.11%**
+    - **Analyse**: **Explosion des performances !**
+        - Le gain est colossal : **-756 points** par rapport au RUN 003 (14806) qui utilisait le même modèle.
+        - Le score CV dépasse même celui du Stacking (14347).
+        - L'écart-type (std) a fondu (451 vs 1540), preuve d'une stabilité extrême.
+- **Résultats Kaggle (Public Leaderboard)**:
+    - Score: **13691.83**
+    - **Amélioration**: **-177 points** vs Stacking (13868).
+    - **Conclusion**: C'est le **meilleur score du projet**. La qualité des données ("Garbage In, Garbage Out") est plus importante que la complexité du modèle. Le nettoyage métier et le retrait des outliers ont débloqué le potentiel du XGBoost.
+
+## Tableau Comparatif Final
+| Run | Méthode | MAE Moyen CV | Kaggle Score |
+|---|---|---|---|
+| 001 | Baseline | 16918 | - |
+| 002 | Log Target | 15093 | - |
+| 003 | FE + Tuning | 14806 | 14125 |
+| 004 | CatBoost | 15264 | - |
+| 005 | Blend (w=0.7) | - | 13884 |
+| 006 | Stacking | 14347 | 13868 |
+| 007 | Poly Features | 14948 | 13995 |
+| **008** | **Cleaning & Outliers** | **14051** | **13692** |
 - [ ] Analyser les features importance.
 - [ ] Tester d'autres algorithmes (XGBoost, LightGBM).
 - [ ] Feature Engineering (création de variables, gestion des outliers).

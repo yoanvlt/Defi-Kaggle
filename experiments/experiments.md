@@ -9,3 +9,4 @@
 | 005 | 2026-02-12 | Blend (Ensemble) | N/A | N/A | Blend XGB (RUN 003) & Cat (RUN 004). <br> - w=0.9: 14004.83 <br> - w=0.8: 13922.41 <br> - **w=0.7: 13884.08** (Best) <br> - w=0.6: 13899.70 | submissions/submission_005_blend_w07.csv | **13884.08306** (-241.42 vs RUN 003) |
 | 006 | 2026-02-12 | Stacking (OOF) | 14346.98 | 8.21% | Stack: XGB(FE) + Cat(Native) + ET. Meta: Ridge. <br> Coefs: XGB~0.48, Cat~0.49, ET~0.07 | submissions/submission_006_stacking.csv | **13868.37275** (Best) |
 | 007 | 2026-02-12 | XGB + Poly Features | 14947.58 ± 1256.80 | 8.48% | Added squared terms for areas (TotalSF^2, etc.). Same params as RUN 003. | submissions/submission_007_xgb_poly_area.csv | **13994.69828** (Better than RUN 003) |
+| 008 | 2026-02-12 | XGB + Advanced Cleaning | 14050.83 ± 451.85 | 8.11% | Removed outliers (>4000sqft) + Domain-specific imputation (None/0) + Mode imputation. | submissions/submission_008_cleaning_outliers.csv | **13691.83234** (New Best!) |
