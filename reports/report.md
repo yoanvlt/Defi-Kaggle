@@ -22,7 +22,9 @@ Prédire le prix de vente des maisons (SalePrice) en minimisant la Mean Absolute
     - Imputation: Median (num), Most Frequent (cat).
     - Encodage: OneHotEncoder (cat).
     - Modèle: HistGradientBoostingRegressor (random_state=42).
-- **Résultats CV**: MAE Moyenne = 16918.83 (+/- 1725.70)
+- **Résultats CV**: 
+    - MAE Moyenne = 16918.83 (+/- 1725.70)
+    - MAPE Moyenne = 9.74% (+/- 1.05%)
 - **Observations**: 
     - Premier jet pour établir une baseline.
     - Utilisation de `HistGradientBoostingRegressor` qui gère nativement les NaN (bien que l'imputer soit présent par sécurité et uniformité).
