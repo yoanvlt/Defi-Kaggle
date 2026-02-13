@@ -1,4 +1,0 @@
-Stacking v3 MAE: 14020.5111
-Stacking v3 MAPE: 0.0801
-Meta Coefs: {'XGB': np.float64(0.45), 'Cat': np.float64(0.4732), 'ET': np.float64(0.0634), 'LGB': np.float64(0.0431)}
-Improvements: OOF Target Encoding (['Neighborhood', 'Condition1', 'Exterior1st', 'Exterior2nd']), Skewness Fix, Feature Drop

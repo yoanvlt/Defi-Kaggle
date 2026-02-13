@@ -1,5 +1,0 @@
-Tuned Stack MAE: 13767.5569
-Tuned Stack MAPE: 0.0788
-Meta: ElasticNet, Coefs: {'XGB': np.float64(0.5765), 'Cat': np.float64(0.3424), 'ET': np.float64(0.102), 'LGB': np.float64(0.0)}
-Ridge MAE: 13795.6266, ElasticNet MAE: 13767.5569
-Improvements: Tuned HP (all 4 models), ElasticNet vs Ridge comparison
