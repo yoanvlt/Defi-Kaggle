@@ -16,7 +16,6 @@ Prédire le prix de vente des maisons (SalePrice) en minimisant la Mean Absolute
 ## Historique des Runs
 
 ### RUN 001: Baseline
-- **Date**: 2026-02-12
 - **Description**: Modèle baseline robuste sans feature engineering complexe.
 - **Pipeline**:
     - Imputation: Median (num), Most Frequent (cat).
@@ -31,7 +30,6 @@ Prédire le prix de vente des maisons (SalePrice) en minimisant la Mean Absolute
     - `OneHotEncoder` avec `handle_unknown='ignore'` pour éviter les erreurs sur le test set.
 
 ### RUN 002: Log Target Boosting + XGBoost
-- **Date**: 2026-02-12
 - **Motivation**: La distribution des prix est asymétrique (skewed). Une transformation `log1p` permet de normaliser la cible et de réduire l'impact des outliers.
 - **Méthode**:
     - Transformation cible: `np.log1p(SalePrice)` entraînement -> `np.expm1(pred)` prédiction.
@@ -44,7 +42,6 @@ Prédire le prix de vente des maisons (SalePrice) en minimisant la Mean Absolute
     - XGBoost semble bien performer avec ces hyperparamètres par défaut.
 
 ### RUN 003: Feature Engineering + Tuning
-- **Date**: 2026-02-12
 - **Motivation**: Intégrer la connaissance métier (surface totale, âge) et optimiser le modèle pour gagner en précision.
 - **Méthode**:
     - **Feature Engineering**: Création de `TotalSF`, `TotalBath`, `Age`, `RemodAge`, `TotalPorchSF`, et indicateurs binaires (Piscine, Garage...).
@@ -66,7 +63,6 @@ Prédire le prix de vente des maisons (SalePrice) en minimisant la Mean Absolute
 | 003 | FE + Tuning | **14806** | **8.53%** | **-2112** |
 
 ### RUN 004: CatBoost + Log Target
-- **Date**: 2026-02-12
 - **Motivation**: Exploiter la gestion native des variables catégorielles par CatBoost (sans OneHot) pour éviter la perte d'information.
 - **Méthode**:
     - **Preprocessing**: Variables catégorielles traitées comme telles (pas de Feature Engineering avancé ici).
@@ -97,7 +93,6 @@ Le score Kaggle (14125) est meilleur que le score Cross-Validation (14806). Cela
 3. **Robustesse** : Le modèle généralise bien et ne semble pas overfitter le train set. En effet, un score Kaggle très inférieur au CV est souvent bon signe (le modèle n'a pas appris le bruit du train).
 
 ### RUN 005: Ensemble / Blending
-- **Date**: 2026-02-12
 - **Motivation**: Combiner les forces de deux modèles performants (XGBoost avec Feature Engineering et CatBoost). Si leurs erreurs ne sont pas parfaitement corrélées, la moyenne pondérée devrait réduire la variance et améliorer le score final.
 - **Méthode**:
     - Blend = $w \times \text{Pred}_{\text{XGB}} + (1-w) \times \text{Pred}_{\text{CatBoost}}$
@@ -121,7 +116,6 @@ Le score Kaggle (14125) est meilleur que le score Cross-Validation (14806). Cela
 | 006 | Stacking (OOF) | **14347** | **13868.37275** |
 
 ### RUN 006: Stacking (Out-Of-Fold)
-- **Date**: 2026-02-12
 - **Motivation**: Aller plus loin que le blending linéaire (poids fixes) en laissant un méta-modèle apprendre la meilleure combinaison des prédictions, tout en garantissant un schéma de validation robuste (OOF) pour éviter le leakage.
 - **Méthode**:
     - **Niveau 1 (Base Models)** :
@@ -151,7 +145,6 @@ Le score Kaggle (14125) est meilleur que le score Cross-Validation (14806). Cela
 | 007 | Poly Features | 14948 | **13994.70** |
 
 ### RUN 007: Polynomial Features (Surfaces au Carré)
-- **Date**: 2026-02-12
 - **Motivation**: Tester si l'ajout explicite de termes quadratiques (surface au carré) aide le modèle à mieux capturer les non-linéarités.
 - **Méthode**:
     - Création de `GrLivArea_sq`, `TotalBsmtSF_sq`, `TotalSF_sq`, etc.
@@ -176,7 +169,6 @@ Le score Kaggle (14125) est meilleur que le score Cross-Validation (14806). Cela
 | **008** | **Cleaning + Outliers** | **14051** | **13691.83** |
 
 ### RUN 008: Advanced Cleaning & Outliers
-- **Date**: 2026-02-12
 - **Motivation**: Améliorer la qualité du signal en traitant les données manquantes avec une logique métier (au lieu d'une médiane générique) et en supprimant les observations aberrantes qui trompent le modèle.
 - **Méthode**:
     - **Suppression Outliers (Train Only)** : Retrait des maisons > 4000 sqft avec prix < 300k$ (Points recommandés par l'auteur du dataset).
@@ -210,7 +202,6 @@ Le score Kaggle (14125) est meilleur que le score Cross-Validation (14806). Cela
 | **008** | **Cleaning + Outliers** | **14051** | **13692** |
 
 ### RUN 009: Stacking + Advanced Cleaning (Le "All-In")
-- **Date**: 2026-02-12
 - **Motivation**: Combiner l'architecture gagnante (Stacking) avec la qualité de données du RUN 008.
 - **Méthode**:
     - **Preprocessing**: Cleaning + Outliers Removal (identique RUN 008).
@@ -243,7 +234,6 @@ Le score Kaggle (14125) est meilleur que le score Cross-Validation (14806). Cela
 | 012 | Tuned Stack + ElasticNet | 13768 | TBD |
 
 ### RUN 010: Stacking v2 — Ordinals + Interactions + LightGBM + Early Stopping
-- **Date**: 2026-02-12
 - **Motivation**: Extraire davantage de signal en enrichissant le feature engineering et en diversifiant l'ensemble.
 - **4 Axes d'Amélioration vs RUN 009**:
     1. **Encodage Ordinal**: 15+ variables qualité (Ex/Gd/TA/Fa/Po → 5/4/3/2/1) converties en numériques au lieu de OneHot.
@@ -261,7 +251,6 @@ Le score Kaggle (14125) est meilleur que le score Cross-Validation (14806). Cela
     - **Conclusion**: **NOUVEAU RECORD ABSOLU**. L'encodage ordinal et les features d'interaction ont débloqué un signal que le OneHot masquait. Le LightGBM apporte une diversité complémentaire au stack. L'early stopping évite l'overfitting. Progression totale depuis la baseline: **16918 → 13075 (-3843, soit -22.7%)**.
 
 ### RUN 011: Stacking v3 — Target Encoding + Skewness + Feature Drop
-- **Date**: 2026-02-12
 - **Motivation**: Enrichir le signal via target encoding (Neighborhood), normaliser les distributions, et réduire le bruit.
 - **3 Axes d'Amélioration vs RUN 010**:
     1. **Target Encoding OOF**: Neighborhood, Condition1, Exterior1st, Exterior2nd encodés par la moyenne cible (sans leakage).
@@ -277,7 +266,6 @@ Le score Kaggle (14125) est meilleur que le score Cross-Validation (14806). Cela
     - **Conclusion**: Le target encoding OOF pour Neighborhood est extrêmement puissant. Progression totale: **16918 → 12970 (-3948, soit -23.3%)**.
 
 ### RUN 012: Tuned Stacking + ElasticNet Meta-Model
-- **Date**: 2026-02-12
 - **Motivation**: Tirer les derniers gains en affinant les hyperparamètres et le meta-model.
 - **Améliorations vs RUN 011**:
     1. **Tuning XGBoost**: lr=0.008, depth=4, gamma=0.01, min_child_weight=3, reg_lambda=2.0
