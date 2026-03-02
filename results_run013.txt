@@ -1,6 +1,0 @@
-RUN 013 — Linear Stack (Ridge + Lasso as base models)
-Stack MAE : 13263.9077
-Stack MAPE: 0.0763
-Meta      : ElasticNet, Coefs: {'XGB': np.float64(0.2923), 'Cat': np.float64(0.1312), 'ET': np.float64(0.0596), 'LGB': np.float64(0.0), 'Ridge': np.float64(0.1694), 'Lasso': np.float64(0.3588)}
-Ridge meta MAE: 13264.9692, ElasticNet meta MAE: 13263.9077
-Improvements: +Ridge & +Lasso base models (StandardScaler), skew fix aligned train/test
