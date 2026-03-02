@@ -298,8 +298,32 @@ Le score Kaggle (14125) est meilleur que le score Cross-Validation (14806). Cela
     - ElasticNet méta sélectionne les poids optimaux sur 6 modèles.
 - **Résultats Kaggle (Public Leaderboard)**:
     - Score: **12608.33**
-    - **Amélioration**: **-274 points** vs RUN 012 (12882). **NOUVEAU RECORD ABSOLU**.
+    - **Amélioration**: **-274 points** vs RUN 012 (12882).
     - **Conclusion**: L'ajout de modèles linéaires dans le stack apporte un signal orthogonal aux trees, confirmant l'hypothèse de diversité architecturale. Progression totale: **16918 → 12608 (-4310, soit -25.5%)**.
+
+### RUN 016: Feature Boost — 10 nouvelles features métier
+- **Motivation**: Au lieu d'agir sur le nettoyage (risque d'overfitting), injecter du **signal métier supplémentaire** que les modèles ne peuvent pas découvrir seuls, surtout les linéaires (Ridge/Lasso).
+- **Améliorations vs RUN 013**:
+    1. **HasBeenRemodeled** : `YearRemodAdd != YearBuilt` — une maison rénovée se vend mieux.
+    2. **BathPerSF** : `TotalBath / TotalSF` — densité de salles de bain = proxy luxe.
+    3. **KitchenValue** : `KitchenQual × KitchenAbvGr` — nombre × qualité des cuisines.
+    4. **TotalQualScore** : somme de `OverallQual + ExterQual + KitchenQual + BsmtQual` — score qualité global.
+    5. **SeasonSold** : vente au printemps (mars-juin) = haute saison immobilière.
+    6. **Has2ndFloor** : présence d'un étage (`2ndFlrSF > 0`).
+    7. **GarageValue** : `GarageCars × GarageFinish` — capacité × finition du garage.
+    8. **AgeBin** : tranches d'âge (neuf/récent/ancien/très ancien).
+    9. **FinishedBsmtRatio** : part du sous-sol aménagé (`BsmtFinSF / TotalBsmtSF`).
+    10. **OverallGrade** : `OverallQual × OverallCond` — qualité globale combinée.
+    - Stack identique RUN 013 : XGB + CatBoost + ExtraTrees + LGB + Ridge + Lasso → méta ElasticNet.
+- **Résultats CV**:
+    - MAE: **13182.81** (vs 13264 RUN 013 — amélioration de **-81 points**)
+    - MAPE: **7.58%** (nouveau meilleur MAPE)
+    - Meta Coefs: **Lasso=0.35**, XGB=0.26, Ridge=0.20, Cat=0.16, ET=0.05, **LGB=0.00**
+    - Lasso passe en tête des poids → les nouvelles features profitent surtout aux modèles linéaires.
+- **Résultats Kaggle (Public Leaderboard)**:
+    - Score: **12537.03**
+    - **Amélioration**: **-71 points** vs RUN 013 (12608). **NOUVEAU RECORD ABSOLU**.
+    - **Conclusion**: Les features métier (interactions qualité, rénovation, saisonnalité) apportent un gain sain et généralisable. Progression totale: **16918 → 12537 (-4381, soit -25.9%)**.
 
 ## Tableau Comparatif Final
 | Run | Méthode | MAE Moyen CV | Kaggle Score |
@@ -316,4 +340,5 @@ Le score Kaggle (14125) est meilleur que le score Cross-Validation (14806). Cela
 | 010 | Stacking v2 (Ord+LGB) | 13951 | 13075 |
 | 011 | Stacking v3 (TE+Skew) | 14021 | 12970 |
 | 012 | Tuned Stack + ElasticNet | 13768 | 12882 |
-| **013** | **Linear Stack (Ridge+Lasso)** | **13264** | **12608** |
+| 013 | Linear Stack (Ridge+Lasso) | 13264 | 12608 |
+| **016** | **Feature Boost (10 features)** | **13183** | **12537** |

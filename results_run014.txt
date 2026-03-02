@@ -1,0 +1,6 @@
+RUN 014 - KRR Lean Stack (XGB + CatBoost + ExtraTrees + KRR)
+Stack MAE : 13748.1361
+Stack MAPE: 0.0789
+Meta      : ElasticNet, Coefs: {'XGB': np.float64(0.5713), 'Cat': np.float64(0.3516), 'ET': np.float64(0.1019), 'KRR': np.float64(-0.003)}
+Ridge meta MAE: 13768.6110, ElasticNet meta MAE: 13748.1361
+RUN 013 reference: MAE=13263.91, Kaggle=12608.33

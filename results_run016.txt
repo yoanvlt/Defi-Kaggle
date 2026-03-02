@@ -1,0 +1,7 @@
+RUN 016 - Feature Boost Stack
+New features: HasBeenRemodeled, BathPerSF, KitchenValue, TotalQualScore, SeasonSold, Has2ndFloor, GarageValue, AgeBin, FinishedBsmtRatio, OverallGrade
+Stack MAE : 13182.8062
+Stack MAPE: 0.0758
+Meta      : ElasticNet, Coefs: {'XGB': np.float64(0.2613), 'Cat': np.float64(0.1585), 'ET': np.float64(0.0469), 'LGB': np.float64(0.0), 'Ridge': np.float64(0.1956), 'Lasso': np.float64(0.3486)}
+Ridge meta MAE: 13189.9212, ElasticNet meta MAE: 13182.8062
+RUN 013 reference: MAE=13263.91, Kaggle=12608.33

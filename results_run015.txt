@@ -1,0 +1,7 @@
+RUN 015 - Deep Clean Stack
+Improvements: Advanced outlier removal + Winsorization + Extended TE (8 cols)
+Stack MAE : 12426.8034
+Stack MAPE: 0.0753
+Meta      : ElasticNet, Coefs: {'XGB': np.float64(0.2241), 'Cat': np.float64(0.2432), 'ET': np.float64(0.0563), 'LGB': np.float64(0.0), 'Ridge': np.float64(0.2098), 'Lasso': np.float64(0.2813)}
+Ridge meta MAE: 12435.7198, ElasticNet meta MAE: 12426.8034
+RUN 013 reference: MAE=13263.91, Kaggle=12608.33
