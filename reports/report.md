@@ -231,7 +231,8 @@ Le score Kaggle (14125) est meilleur que le score Cross-Validation (14806). Cela
 | **009** | **Stacking Cleaned** | **13838** | **13375** |
 | **010** | **Stacking v2 (Ord+LGB)** | **13951** | **13075** |
 | 011 | Stacking v3 (TE+Skew) | 14021 | 12970 |
-| 012 | Tuned Stack + ElasticNet | 13768 | TBD |
+| 012 | Tuned Stack + ElasticNet | 13768 | 12882 |
+| **013** | **Linear Stack (Ridge+Lasso)** | **13264** | **12608** |
 
 ### RUN 010: Stacking v2 — Ordinals + Interactions + LightGBM + Early Stopping
 - **Motivation**: Extraire davantage de signal en enrichissant le feature engineering et en diversifiant l'ensemble.
@@ -275,10 +276,44 @@ Le score Kaggle (14125) est meilleur que le score Cross-Validation (14806). Cela
     5. **ElasticNet Meta-Model**: L1+L2 combinés. A zéroté le coefficient de LGB (redondant avec XGB).
 - **Résultats CV**:
     - MAE: **13767.56** (vs 14020 RUN 011 — nette amélioration)
-    - MAPE: **7.88%** (meilleur MAPE de tout le projet)
+    - MAPE: **7.88%**
     - ElasticNet > Ridge (13768 vs 13796)
     - Meta Coefs: XGB=0.58, Cat=0.34, ET=0.10, **LGB=0.00** (éliminé par L1)
 - **Résultats Kaggle (Public Leaderboard)**:
     - Score: **12882.12**
-    - **Amélioration**: **-88 points** vs RUN 011 (12970). **NOUVEAU RECORD ABSOLU**.
+    - **Amélioration**: **-88 points** vs RUN 011 (12970).
     - **Conclusion**: Le tuning fin + ElasticNet apportent un gain constant. Progression totale: **16918 → 12882 (-4036, soit -23.9%)**.
+
+### RUN 013: Linear Stack — Ridge + Lasso comme Base Models
+- **Motivation**: Le stack (RUN 012) est composé exclusivement de modèles à base de trees. Ajouter un modèle linéaire (Ridge/Lasso) apporte une **diversité architecturale** réelle : les modèles linéaires et les arbres font des erreurs structurellement différentes, ce qui réduit la variance du méta-modèle.
+- **Améliorations vs RUN 012**:
+    1. **Ridge (α=10)** : 5ème base model, entraîné avec `StandardScaler` (obligatoire pour la régularisation L2).
+    2. **Lasso (α=0.0005)** : 6ème base model avec régularisation L1 (sélection de features implicite), également avec `StandardScaler`.
+    3. **Preprocesseur dédié** : pipeline séparé pour les modèles linéaires (`SimpleImputer → StandardScaler → OneHotEncoder`) vs trees (sans scaler).
+    4. **Correction bug skewness** : la liste des colonnes skewed est calculée sur le train puis appliquée au test (aligne train/test — évite le désalignement de colonnes).
+    5. **Stack 6 modèles** : XGB + CatBoost + ExtraTrees + LGB + Ridge + Lasso → méta ElasticNet.
+- **Résultats CV**:
+    - MAE: **13263.91** (vs 13767 RUN 012 — amélioration de **-504 points**)
+    - MAPE: **7.63%** (meilleur MAPE de tout le projet)
+    - ElasticNet méta sélectionne les poids optimaux sur 6 modèles.
+- **Résultats Kaggle (Public Leaderboard)**:
+    - Score: **12608.33**
+    - **Amélioration**: **-274 points** vs RUN 012 (12882). **NOUVEAU RECORD ABSOLU**.
+    - **Conclusion**: L'ajout de modèles linéaires dans le stack apporte un signal orthogonal aux trees, confirmant l'hypothèse de diversité architecturale. Progression totale: **16918 → 12608 (-4310, soit -25.5%)**.
+
+## Tableau Comparatif Final
+| Run | Méthode | MAE Moyen CV | Kaggle Score |
+|---|---|---|---|
+| 001 | Baseline | 16918 | - |
+| 002 | Log Target | 15093 | - |
+| 003 | FE + Tuning | 14806 | 14125 |
+| 004 | CatBoost | 15264 | - |
+| 005 | Blend (w=0.7) | - | 13884 |
+| 006 | Stacking | 14347 | 13868 |
+| 007 | Poly Features | 14948 | 13995 |
+| 008 | Cleaning & Outliers | 14051 | 13692 |
+| 009 | Stacking Cleaned | 13838 | 13375 |
+| 010 | Stacking v2 (Ord+LGB) | 13951 | 13075 |
+| 011 | Stacking v3 (TE+Skew) | 14021 | 12970 |
+| 012 | Tuned Stack + ElasticNet | 13768 | 12882 |
+| **013** | **Linear Stack (Ridge+Lasso)** | **13264** | **12608** |
