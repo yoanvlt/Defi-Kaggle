@@ -325,6 +325,31 @@ Le score Kaggle (14125) est meilleur que le score Cross-Validation (14806). Cela
     - **Amélioration**: **-71 points** vs RUN 013 (12608). **NOUVEAU RECORD ABSOLU**.
     - **Conclusion**: Les features métier (interactions qualité, rénovation, saisonnalité) apportent un gain sain et généralisable. Progression totale: **16918 → 12537 (-4381, soit -25.9%)**.
 
+### RUN 017: Restructuration Code, Clustering Spatial & Tuning Optuna
+- **Motivation**: Restructuration complète du code dans un `main.py` modulaire. Ajout d'une segmentation géographique (`Neighborhood_Clustered`) pour séparer les quartiers pauvres des quartiers riches, basée sur les prix médians au M². Le modèle XGBoost a été entièrement ré-optimisé via Optuna (50 trials) pour s'adapter parfaitement à cette nouvelle feature géographique.
+- **Améliorations**: 
+  - **Feature Spatial Clustering**.
+  - **Nouveaux Paramètres XGBoost (Optuna)** : `n_estimators=5000`, `learning_rate=0.0156`, `max_depth=4`, `subsample=0.71`, `colsample_bytree=0.435`, `reg_alpha=0.0345`, `reg_lambda=0.162`, `min_child_weight=2`, `gamma=0.0027`.
+- **Résultats CV**:
+    - MAE: **13102.3** (vs 13155 lors du premier jet sans Optuna, amélioration **-53 points**)
+- **Résultats Kaggle (Public Leaderboard)**:
+    - Score: **12449.04**
+    - **Amélioration**: **-88 points** vs RUN 016 (12537.03). **NOUVEAU RECORD ABSOLU**.
+    - **Conclusion**: Le tuning d'Optuna combiné au signal très propre de la localisation spatiale a permis de descendre sous la barre des 12500 !
+
+### RUN 018: Tuning Optuna sans Clustering (Test d'ablation)
+- **Motivation**: Tester si le gain du RUN 017 vient du tuning Optuna seul ou de la combinaison avec le clustering spatial. On applique les hyperparamètres découverts par Optuna sur la configuration du RUN 016 (sans la segmentation des quartiers).
+- **Améliorations**: 
+  - Retrait de `Neighborhood_Clustered` du pipeline.
+  - Conservation des Hyperparamètres Optuna spécifiques de l'expérience #17.
+- **Résultats CV**:
+    - MAE: **13149.64** (vs 13183 RUN 016 — amélioration de **-33 points**)
+    - *Note*: Comparé au RUN 017 (Clustering + Optuna) qui fait 13102, on constate qu'on perd le gain combiné synergique de la localisation. Optuna seul gagne -33 points, Clustering seul gagnait -28 points. Mais combinés, ils grappillent -81 points !
+- **Résultats Kaggle (Public Leaderboard)**:
+    - Score: **12420.60**
+    - **Amélioration**: **-28 points** vs RUN 017 (12449.04). **NOUVEAU RECORD ABSOLU**.
+    - **Conclusion**: C'est un retournement de situation fascinant ! Le modèle *sans* la feature spatiale (`Neighborhood_Clustered`) s'en sort **mieux** sur le leaderboard public, bien que sa MAE Cross-Validation locale soit moins bonne (13149 vs 13102). Cela démontre que le `Neighborhood_Clustered` introduisait un léger **overfitting** sur le train set, pénalisant la généralisation sur les données de test non vues. Optuna pur sur les bonnes features métier est roi !
+
 ## Tableau Comparatif Final
 | Run | Méthode | MAE Moyen CV | Kaggle Score |
 |---|---|---|---|
@@ -341,4 +366,6 @@ Le score Kaggle (14125) est meilleur que le score Cross-Validation (14806). Cela
 | 011 | Stacking v3 (TE+Skew) | 14021 | 12970 |
 | 012 | Tuned Stack + ElasticNet | 13768 | 12882 |
 | 013 | Linear Stack (Ridge+Lasso) | 13264 | 12608 |
-| **016** | **Feature Boost (10 features)** | **13183** | **12537** |
+| 016 | Feature Boost (10 features) | 13183 | 12537.03 |
+| 017 | Clustering Spatial + Optuna | 13102 | 12449.04 |
+| **018** | **Optuna sans Clustering** | **13149.6** | **12420.60** |

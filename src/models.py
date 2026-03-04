@@ -21,10 +21,10 @@ def get_xgboost(preprocessor):
     return Pipeline([
         ("preprocessor", preprocessor),
         ("xgb", XGBRegressor(
-            n_estimators=8000, learning_rate=0.008, max_depth=4,
-            subsample=0.7, colsample_bytree=0.6,
-            reg_alpha=0.1, reg_lambda=2.0,
-            min_child_weight=3, gamma=0.01,
+            n_estimators=5000, learning_rate=0.0156, max_depth=4,
+            subsample=0.71, colsample_bytree=0.435,
+            reg_alpha=0.0345, reg_lambda=0.162,
+            min_child_weight=2, gamma=0.0027,
             early_stopping_rounds=150,
             random_state=RANDOM_STATE, n_jobs=-1
         ))

@@ -11,7 +11,7 @@ sys.path.append(os.path.dirname(__file__))
 # Import de toutes nos méthodes
 from src.cleaning import clean_data, remove_outliers
 from src.features import add_features, encode_ordinals, add_poly_features
-from src.advanced_features import add_advanced_features
+from src.advanced_features import add_advanced_features, add_spatial_clusters
 from src.stacking import (
     build_tree_preprocessor, build_linear_preprocessor,
     fix_skewness, target_encode_oof, get_oof_preds, evaluate_meta,
@@ -33,13 +33,14 @@ CONFIG = {
     "preprocessing_steps": [
         clean_data,             # Nettoyage de base (gestion des NaNs)
         encode_ordinals,        # Encodage manuel des variables qualitatives
+        # add_spatial_clusters,   # Clustering spatial par quartier
         add_features,           # Features de base
         # add_poly_features,    # Features polynomiales (décommenté = activé)
         add_advanced_features   # Features métier (décommenté = activé)
     ],
     
     # 📌 Colonnes à dropper et encoder
-    "drop_features": ["Utilities", "Street", "PoolQC", "PoolArea", "MiscFeature", "MiscVal", "Id"],
+    "drop_features": ["Utilities", "Street", "PoolQC", "PoolArea", "MiscFeature", "MiscVal", "Id", "HouseStyle_1.5Unf"],
     "target_encode_cols": ["Neighborhood", "Condition1", "Exterior1st", "Exterior2nd"],
     
     # 📌 Modèles à utiliser pour ce run (doivent exister dans AVAILABLE_MODELS dans src/models.py)
@@ -55,7 +56,7 @@ CONFIG = {
     "run_settings": {
         "random_state": 42,
         "n_splits": 5,
-        "submission_path": "submissions/submission_main.csv"
+        "submission_path": "submissions/submission_run018.csv"
     }
 }
 

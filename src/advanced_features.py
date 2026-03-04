@@ -10,6 +10,27 @@ import pandas as pd
 import numpy as np
 
 
+def add_spatial_clusters(df):
+    """
+    Crée une feature 'Neighborhood_Clustered' qui regroupe les quartiers
+    selon leur niveau de prix médian (Faible, Moyen-Faible, Moyen-Haut, Haut).
+    """
+    df_out = df.copy()
+    
+    if "Neighborhood" in df_out.columns:
+        # Clusters définis selon l'observation des prix médians
+        cluster_map = {
+            "MeadowV": 0, "IDOTRR": 0, "BrDale": 0, "OldTown": 0, "Edwards": 0, "BrkSide": 0, "Sawyer": 0, "Blueste": 0, "SWISU": 0, # < 140k
+            "NAmes": 1, "NPkVill": 1, "Mitchel": 1, "SawyerW": 1, "Gilbert": 1, "NWAmes": 1, "Blmngtn": 1, "CollgCr": 1, # 140k - 198k
+            "ClearCr": 2, "Crawfor": 2, "Veenker": 2, "Somerst": 2, "Timber": 2, # 200k - 230k
+            "StoneBr": 3, "NoRidge": 3, "NridgHt": 3 # > 270k
+        }
+        df_out["Neighborhood_Clustered"] = df_out["Neighborhood"].map(cluster_map).fillna(1).astype(int)
+        print("  Spatial feature added: Neighborhood_Clustered")
+        
+    return df_out
+
+
 def add_advanced_features(df):
     """
     Ajoute 10 features métier au DataFrame.
